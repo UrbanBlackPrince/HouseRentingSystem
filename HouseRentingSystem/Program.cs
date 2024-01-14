@@ -13,7 +13,7 @@ namespace HouseRentingSystem
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             builder.Services.AddDbContext<HouseRentingDbContext>(options =>
                 options.UseSqlServer(connectionString));
-         
+
 
             builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
             {
@@ -25,6 +25,8 @@ namespace HouseRentingSystem
 
             })
                 .AddEntityFrameworkStores<HouseRentingDbContext>();
+
+           
 
             builder.Services.AddControllersWithViews();
 

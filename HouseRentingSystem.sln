@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{87
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HouseRentingSystem.Services.Data", "HouseRentingSystem.Services.Data\HouseRentingSystem.Services.Data.csproj", "{203FEBFB-C22F-4000-B897-4C6BE0218027}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HouseRentingSystem.Infractructure", "HouseRentingSystem.Infractructure\HouseRentingSystem.Infractructure.csproj", "{F163CF37-2B6C-4EA9-9B53-08C79D5BE0BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{203FEBFB-C22F-4000-B897-4C6BE0218027}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{203FEBFB-C22F-4000-B897-4C6BE0218027}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{203FEBFB-C22F-4000-B897-4C6BE0218027}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F163CF37-2B6C-4EA9-9B53-08C79D5BE0BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F163CF37-2B6C-4EA9-9B53-08C79D5BE0BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F163CF37-2B6C-4EA9-9B53-08C79D5BE0BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F163CF37-2B6C-4EA9-9B53-08C79D5BE0BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -61,6 +67,7 @@ Global
 		{482BC7F3-0B32-408F-A982-917F5C599D7B} = {F217DF5E-42A1-470B-B93F-0CDBA4B12118}
 		{3FBD5292-A04F-40FC-99F0-F798DA80E887} = {C032DC67-8800-4CC0-BC65-526C581A0A42}
 		{203FEBFB-C22F-4000-B897-4C6BE0218027} = {87D59BF5-1EC9-460E-9068-16EEF6B8A947}
+		{F163CF37-2B6C-4EA9-9B53-08C79D5BE0BB} = {C032DC67-8800-4CC0-BC65-526C581A0A42}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E7422209-AF0A-49C4-9190-7A6B923599D7}

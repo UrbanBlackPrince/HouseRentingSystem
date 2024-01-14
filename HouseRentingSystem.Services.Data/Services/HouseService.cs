@@ -1,6 +1,7 @@
 ﻿using HouseRentingSystem.Data;
 using HouseRentingSystem.Services.Data.Interfaces;
 using HouseRentingSystem.Web.ViewModels.Home;
+using Microsoft.EntityFrameworkCore;
 
 namespace HouseRentingSystem.Services.Data.Services
 {
@@ -13,9 +14,21 @@ namespace HouseRentingSystem.Services.Data.Services
             this.dbContext = dbContext;
         }
 
-        public Task<IEnumerable<IndexViewModel>> LastThreeHousesAsync()
+        public async Task<IEnumerable<IndexViewModel>> LastThreeHousesAsync()
         {
-            throw new NotImplementedException();
+            IEnumerable<IndexViewModel> lastThreeHouses = await this.dbContext
+                 .Houses
+                 .OrderByDescending(x => x.CreatedOn)
+                 .Take(3)
+                 .Select(h => new IndexViewModel()
+                 {
+                     Id = h.Id.ToString(),
+                     Title = h.Title,
+                     ImageUrl = h.ImageUrl,
+                 })
+                 .ToArrayAsync();
+
+            return lastThreeHouses;
         }
     }
 }
