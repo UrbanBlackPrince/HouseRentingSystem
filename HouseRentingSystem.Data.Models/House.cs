@@ -31,6 +31,8 @@ namespace HouseRentingSystem.Data.Models
 
         public decimal PricePerMounth { get; set; }
 
+        public DateTime CreatedOn { get; set; }
+
         public int CategoryId { get; set; }
 
         public virtual Category Category { get; set; } = null!;
