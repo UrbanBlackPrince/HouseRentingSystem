@@ -1,5 +1,7 @@
 ﻿using HouseRentingSystem.Data;
 using HouseRentingSystem.Data.Models;
+using HouseRentingSystem.Infractructure.Extensions;
+using HouseRentingSystem.Services.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace HouseRentingSystem
@@ -26,8 +28,8 @@ namespace HouseRentingSystem
             })
                 .AddEntityFrameworkStores<HouseRentingDbContext>();
 
-           
 
+            builder.Services.AddApplicationServices(typeof(IHouseService));
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
