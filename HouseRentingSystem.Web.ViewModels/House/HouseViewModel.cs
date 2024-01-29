@@ -35,6 +35,6 @@ namespace HouseRentingSystem.Web.ViewModels.House
         [Display(Name = "Category")]
         public int CategoryId { get; set; }
 
-        public IEnumerable<HouseSelectCategoryViewModel> Categories { get; }
+        public IEnumerable<HouseSelectCategoryViewModel> Categories { get; set; }
     }
 }
