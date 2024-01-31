@@ -12,6 +12,8 @@ namespace HouseRentingSystem.Services.Data.Interfaces
 
         Task<AllHousesFilteredAndPagedServiceModel> AllAsync(AllHousesQueryViewModel queryModel);
 
+        Task<IEnumerable<HouseAllViewModel>> AllByAgentIdAsync(string agentId);
 
+        Task<IEnumerable<HouseAllViewModel>> AllByUserIdAsync(string userId);
     }
 }

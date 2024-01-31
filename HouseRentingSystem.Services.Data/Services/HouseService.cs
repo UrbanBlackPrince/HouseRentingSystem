@@ -22,6 +22,7 @@ namespace HouseRentingSystem.Services.Data.Services
         {
             IEnumerable<IndexViewModel> lastThreeHouses = await this.dbContext
                  .Houses
+                 .Where(h => h.IsActive)
                  .OrderByDescending(x => x.CreatedOn)
                  .Take(3)
                  .Select(h => new IndexViewModel()
@@ -85,6 +86,7 @@ namespace HouseRentingSystem.Services.Data.Services
 
             // Get the paginated houses
             IEnumerable<HouseAllViewModel> allHouses = await housesQuery
+                .Where(h => h.IsActive)
                 .Skip((queryModel.CurrentPage - 1) * queryModel.HousesPerPage)
                 .Take(queryModel.HousesPerPage)
                 .Select(h => new HouseAllViewModel
@@ -108,6 +110,46 @@ namespace HouseRentingSystem.Services.Data.Services
             };
         }
 
+        public async Task<IEnumerable<HouseAllViewModel>> AllByAgentIdAsync(string agentId)
+        {
+            IEnumerable<HouseAllViewModel> allAgentHouses = await this.dbContext
+                .Houses
+                .Where(h => h.IsActive)
+                .Where(h => h.Agent.Id.ToString() == agentId)
+                .Select(h => new HouseAllViewModel()
+                {
+                    Id = h.Id,
+                    Title = h.Title,
+                    Address = h.Address,
+                    ImageUrl = h.ImageUrl,
+                    PricePerMounth = h.PricePerMounth,
+                    IsRented = h.RenterId.HasValue
+                })
+                .ToArrayAsync();
+
+            return allAgentHouses;
+        }
+
+        public async Task<IEnumerable<HouseAllViewModel>> AllByUserIdAsync(string userId)
+        {
+            IEnumerable<HouseAllViewModel> allUserHouses = await this.dbContext
+               .Houses
+               .Where(h => h.IsActive)
+               .Where(h => h.RenterId.HasValue &&
+               h.RenterId.ToString() == userId)
+               .Select(h => new HouseAllViewModel()
+               {
+                   Id = h.Id,
+                   Title = h.Title,
+                   Address = h.Address,
+                   ImageUrl = h.ImageUrl,
+                   PricePerMounth = h.PricePerMounth,
+                   IsRented = h.RenterId.HasValue
+               })
+               .ToArrayAsync();
+
+            return allUserHouses;
+        }
     }
 }
 
