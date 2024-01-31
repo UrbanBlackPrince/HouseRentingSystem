@@ -1,5 +1,6 @@
 ﻿using HouseRentingSystem.Infractructure.Extensions;
 using HouseRentingSystem.Services.Data.Interfaces;
+using HouseRentingSystem.Services.Data.Models.House;
 using HouseRentingSystem.Web.ViewModels.House;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,12 +21,19 @@ namespace HouseRentingSystem.Controllers
             this.houseService = houseService;
         }
 
+        [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> All()
+        public async Task<IActionResult> All([FromQuery] AllHousesQueryViewModel queryModel)
         {
-            return this.Ok();
-        }
+            AllHousesFilteredAndPagedServiceModel serviceModel =
+                await this.houseService.AllAsync(queryModel);
 
+            queryModel.Houses = serviceModel.Houses;
+            queryModel.TotalHouses = serviceModel.TotalHousesCount;
+            queryModel.Categories = await this.categoryService.AllCategoryNamesAsync();
+
+            return this.View(queryModel);
+        }
 
         [HttpGet]
         public async Task<IActionResult> Add()
@@ -86,6 +94,48 @@ namespace HouseRentingSystem.Controllers
             }
 
             return this.RedirectToAction("All", "House");
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> Details(string id)
+        {
+           HouseDetailsViewModel viewModel = await this.houseService
+                .GetDetailsByIdAsync(id);
+
+            if (viewModel == null)
+            {
+                this.TempData[ErrorMessage] = "House with the provided id does not exist!";
+
+                return RedirectToAction("All", "House");
+            }
+
+           return View(viewModel);  
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Mine()
+        {
+            List<HouseAllViewModel> myHouses =
+                new List<HouseAllViewModel>();
+
+            string userId = this.User.GetId()!;
+            bool isUserAgent = await this.agentService
+                .AgentExistsByUserIdAsync(userId);
+
+            if(isUserAgent)
+            {
+                string? agentId =
+                    await this.agentService.GetAgentIdByUserIdAsync(userId);
+
+                myHouses.AddRange(await this.houseService.AllByAgentIdAsync(agentId!));
+            }
+            else
+            {
+                myHouses.AddRange(await this.houseService.AllByAgentIdAsync(userId));
+            }
+            return this.View(myHouses);  
         }
 
     }

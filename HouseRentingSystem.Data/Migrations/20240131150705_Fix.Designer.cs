@@ -4,6 +4,7 @@ using HouseRentingSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HouseRentingSystem.Data.Migrations
 {
     [DbContext(typeof(HouseRentingDbContext))]
-    partial class HouseRentingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240131150705_Fix")]
+    partial class Fix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -176,11 +178,6 @@ namespace HouseRentingSystem.Data.Migrations
                         .HasMaxLength(2048)
                         .HasColumnType("nvarchar(2048)");
 
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
                     b.Property<decimal>("PricePerMounth")
                         .HasColumnType("decimal(18,2)");
 
@@ -205,41 +202,38 @@ namespace HouseRentingSystem.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("c94772f0-57af-4383-aaed-6270d226b4d1"),
+                            Id = new Guid("46028e75-49be-4df5-8043-a66abb42d7a9"),
                             Address = "North London, UK (near the border)",
                             AgentId = new Guid("6dd681b2-3bda-4b30-9755-0e12c7f27ce4"),
                             CategoryId = 3,
                             CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "A big house for your whole family. Don't miss to buy a house with three bedrooms.",
                             ImageUrl = "https://www.luxury-architecture.net/wp-content/uploads/2017/12/1513217889-7597-FAIRWAYS-010.jpg",
-                            IsActive = false,
                             PricePerMounth = 2100.00m,
                             RenterId = new Guid("c7b6e1a6-954b-47e6-8cf7-a488a810ce96"),
                             Title = "Big House Marina"
                         },
                         new
                         {
-                            Id = new Guid("061228c1-805b-4a80-8856-e5f88ee10b55"),
+                            Id = new Guid("71458b18-3657-4e04-8c89-82d19ce3bf11"),
                             Address = "Near the Sea Garden in Burgas, Bulgaria",
                             AgentId = new Guid("6dd681b2-3bda-4b30-9755-0e12c7f27ce4"),
                             CategoryId = 2,
                             CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "It has the best comfort you will ever ask for. With two bedrooms, it is great for your family.",
                             ImageUrl = "https://cf.bstatic.com/xdata/images/hotel/max1024x768/179489660.jpg?k=2029f6d9589b49c95dcc9503a265e292c2cdfcb5277487a0050397c3f8dd545a&o=&hp=1",
-                            IsActive = false,
                             PricePerMounth = 1200.00m,
                             Title = "Family House Comfort"
                         },
                         new
                         {
-                            Id = new Guid("887068f2-62af-4028-ac71-04dbf60d66cf"),
+                            Id = new Guid("877aefcf-c34b-4878-9524-51125106649a"),
                             Address = "Boyana Neighbourhood, Sofia, Bulgaria",
                             AgentId = new Guid("6dd681b2-3bda-4b30-9755-0e12c7f27ce4"),
                             CategoryId = 2,
                             CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "This luxurious house is everything you will need. It is just excellent.",
                             ImageUrl = "https://i.pinimg.com/originals/a6/f5/85/a6f5850a77633c56e4e4ac4f867e3c00.jpg",
-                            IsActive = false,
                             PricePerMounth = 2000.00m,
                             Title = "Grand House"
                         });

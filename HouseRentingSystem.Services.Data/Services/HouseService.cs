@@ -2,6 +2,7 @@
 using HouseRentingSystem.Data.Models;
 using HouseRentingSystem.Services.Data.Interfaces;
 using HouseRentingSystem.Services.Data.Models.House;
+using HouseRentingSystem.Web.ViewModels.Agent;
 using HouseRentingSystem.Web.ViewModels.Home;
 using HouseRentingSystem.Web.ViewModels.House;
 using HouseRentingSystem.Web.ViewModels.House.Enums;
@@ -22,6 +23,7 @@ namespace HouseRentingSystem.Services.Data.Services
         {
             IEnumerable<IndexViewModel> lastThreeHouses = await this.dbContext
                  .Houses
+                 .Where(h => h.IsActive)
                  .OrderByDescending(x => x.CreatedOn)
                  .Take(3)
                  .Select(h => new IndexViewModel()
@@ -55,51 +57,42 @@ namespace HouseRentingSystem.Services.Data.Services
 
         public async Task<AllHousesFilteredAndPagedServiceModel> AllAsync(AllHousesQueryViewModel queryModel)
         {
-            IQueryable<House> housesQuery = this.dbContext
-                .Houses
-                .AsQueryable();
+            IQueryable<House> housesQuery = this.dbContext.Houses.AsQueryable();
 
-            if(!string.IsNullOrWhiteSpace(queryModel.Category))
+            // Filter by category
+            if (!string.IsNullOrWhiteSpace(queryModel.Category))
             {
-                housesQuery = housesQuery
-                    .Where(h => h.Category.Name == queryModel.Category);
+                housesQuery = housesQuery.Where(h => h.Category.Name == queryModel.Category);
             }
 
-            if(string.IsNullOrWhiteSpace(queryModel.SearchString))
+            // Filter by search string
+            if (!string.IsNullOrWhiteSpace(queryModel.SearchString))
             {
                 string wildCard = $"%{queryModel.SearchString.ToLower()}%";
-
-                housesQuery = housesQuery
-                    .Where(h => 
+                housesQuery = housesQuery.Where(h =>
                     EF.Functions.Like(h.Title, wildCard) ||
                     EF.Functions.Like(h.Address, wildCard) ||
                     EF.Functions.Like(h.Description, wildCard));
             }
 
+            // Apply sorting
             housesQuery = queryModel.HouseSorting switch
             {
-                HouseSorting.Newest => housesQuery
-                .OrderBy(h => h.CreatedOn),
-
-                HouseSorting.Oldest => housesQuery
-               .OrderByDescending(h => h.CreatedOn),
-
-                HouseSorting.PriceAscending => housesQuery
-                .OrderBy(h => h.PricePerMounth),
-
-                HouseSorting.PriceDescending => housesQuery
-             .OrderByDescending(h => h.PricePerMounth),
-                _ => housesQuery
-                .OrderBy(h => h.RenterId != null)
-                .ThenByDescending(h => h.CreatedOn)
+                HouseSorting.Newest => housesQuery.OrderBy(h => h.CreatedOn),
+                HouseSorting.Oldest => housesQuery.OrderByDescending(h => h.CreatedOn),
+                HouseSorting.PriceAscending => housesQuery.OrderBy(h => h.PricePerMounth),
+                HouseSorting.PriceDescending => housesQuery.OrderByDescending(h => h.PricePerMounth),
+                _ => housesQuery.OrderBy(h => h.RenterId != null).ThenByDescending(h => h.CreatedOn)
             };
 
+            // Get the paginated houses
             IEnumerable<HouseAllViewModel> allHouses = await housesQuery
+                .Where(h => h.IsActive)
                 .Skip((queryModel.CurrentPage - 1) * queryModel.HousesPerPage)
                 .Take(queryModel.HousesPerPage)
                 .Select(h => new HouseAllViewModel
                 {
-                    Id = h.Id.ToString(),
+                    Id = h.Id,
                     Title = h.Title,
                     Address = h.Address,
                     ImageUrl = h.ImageUrl,
@@ -107,6 +100,87 @@ namespace HouseRentingSystem.Services.Data.Services
                     IsRented = h.RenterId.HasValue
                 })
                 .ToArrayAsync();
+
+            // Count the total houses
+            int totalHouses = housesQuery.Count();
+
+            return new AllHousesFilteredAndPagedServiceModel()
+            {
+                TotalHousesCount = totalHouses,
+                Houses = allHouses
+            };
+        }
+
+        public async Task<IEnumerable<HouseAllViewModel>> AllByAgentIdAsync(string agentId)
+        {
+            IEnumerable<HouseAllViewModel> allAgentHouses = await this.dbContext
+                .Houses
+                .Where(h => h.IsActive)
+                .Where(h => h.Agent.Id.ToString() == agentId)
+                .Select(h => new HouseAllViewModel()
+                {
+                    Id = h.Id,
+                    Title = h.Title,
+                    Address = h.Address,
+                    ImageUrl = h.ImageUrl,
+                    PricePerMounth = h.PricePerMounth,
+                    IsRented = h.RenterId.HasValue
+                })
+                .ToArrayAsync();
+
+            return allAgentHouses;
+        }
+
+        public async Task<IEnumerable<HouseAllViewModel>> AllByUserIdAsync(string userId)
+        {
+            IEnumerable<HouseAllViewModel> allUserHouses = await this.dbContext
+               .Houses
+               .Where(h => h.IsActive)
+               .Where(h => h.RenterId.HasValue &&
+               h.RenterId.ToString() == userId)
+               .Select(h => new HouseAllViewModel()
+               {
+                   Id = h.Id,
+                   Title = h.Title,
+                   Address = h.Address,
+                   ImageUrl = h.ImageUrl,
+                   PricePerMounth = h.PricePerMounth,
+                   IsRented = h.RenterId.HasValue
+               })
+               .ToArrayAsync();
+
+            return allUserHouses;
+        }
+
+        public async Task<HouseDetailsViewModel?> GetDetailsByIdAsync(string houseId)
+        {
+            House? house = await dbContext
+                .Houses
+                .Include(h => h.Category)
+                .Include(h => h.Agent)
+                .ThenInclude(a => a.User)
+                .Where(h => h.IsActive)
+                .FirstOrDefaultAsync(h => h.Id.ToString() == houseId);
+
+            if(house == null) return null;
+
+            return new HouseDetailsViewModel
+            {
+                Id = house.Id,
+                Title = house.Title,
+                Address = house.Address,
+                ImageUrl = house.ImageUrl,
+                PricePerMounth = house.PricePerMounth,
+                IsRented = house.RenterId.HasValue,
+                Description = house.Description,
+                Category = house.Category.Name,
+                Agent = new AgentInfoOnHouseViewModel()
+                {
+                    Email = house.Agent.User.Email,
+                    PhoneNumber = house.Agent.PhoneNumber
+                }
+            };
         }
     }
 }
+

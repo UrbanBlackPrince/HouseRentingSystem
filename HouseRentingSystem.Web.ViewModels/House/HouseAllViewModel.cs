@@ -4,7 +4,7 @@ namespace HouseRentingSystem.Web.ViewModels.House
 {
     public class HouseAllViewModel
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string Title { get; set; } = null!;
 
