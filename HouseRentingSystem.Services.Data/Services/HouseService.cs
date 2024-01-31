@@ -2,6 +2,7 @@
 using HouseRentingSystem.Data.Models;
 using HouseRentingSystem.Services.Data.Interfaces;
 using HouseRentingSystem.Services.Data.Models.House;
+using HouseRentingSystem.Web.ViewModels.Agent;
 using HouseRentingSystem.Web.ViewModels.Home;
 using HouseRentingSystem.Web.ViewModels.House;
 using HouseRentingSystem.Web.ViewModels.House.Enums;
@@ -149,6 +150,36 @@ namespace HouseRentingSystem.Services.Data.Services
                .ToArrayAsync();
 
             return allUserHouses;
+        }
+
+        public async Task<HouseDetailsViewModel?> GetDetailsByIdAsync(string houseId)
+        {
+            House? house = await dbContext
+                .Houses
+                .Include(h => h.Category)
+                .Include(h => h.Agent)
+                .ThenInclude(a => a.User)
+                .Where(h => h.IsActive)
+                .FirstOrDefaultAsync(h => h.Id.ToString() == houseId);
+
+            if(house == null) return null;
+
+            return new HouseDetailsViewModel
+            {
+                Id = house.Id,
+                Title = house.Title,
+                Address = house.Address,
+                ImageUrl = house.ImageUrl,
+                PricePerMounth = house.PricePerMounth,
+                IsRented = house.RenterId.HasValue,
+                Description = house.Description,
+                Category = house.Category.Name,
+                Agent = new AgentInfoOnHouseViewModel()
+                {
+                    Email = house.Agent.User.Email,
+                    PhoneNumber = house.Agent.PhoneNumber
+                }
+            };
         }
     }
 }
