@@ -23,6 +23,8 @@ namespace HouseRentingSystem.Web.ViewModels.House
         public HouseSorting HouseSorting { get; set; }
 
         public int CurrentPage { get; set; }
+
+        [Display(Name = "Show Houses On Page")]
         public int HousesPerPage { get; set; }
         public int TotalHouses { get; set; }
 
