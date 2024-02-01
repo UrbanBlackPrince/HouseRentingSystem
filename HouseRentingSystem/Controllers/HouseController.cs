@@ -108,10 +108,48 @@ namespace HouseRentingSystem.Controllers
                 return RedirectToAction("All", "House");
             }
 
-           HouseDetailsViewModel viewModel = await this.houseService
-                .GetDetailsByIdAsync(id);
+            HouseDetailsViewModel viewModel = await this.houseService
+                 .GetDetailsByIdAsync(id);
 
-           return View(viewModel);  
+            return View(viewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(string id)
+        {
+            bool houseExist = await this.houseService.ExistByIdAsync(id);
+            if (!houseExist)
+            {
+                this.TempData[ErrorMessage] = "House with the provided id does not exist!";
+
+                return RedirectToAction("All", "House");
+            }
+
+            bool isAgent =
+                 await this.agentService.AgentExistsByUserIdAsync(this.User.GetId()!);
+            if (!isAgent)
+            {
+                this.TempData[ErrorMessage] = "You must become an agent in order to edit house info!";
+
+                return this.RedirectToAction("Become", "Agent");
+            }
+
+            string? agentId = await this.agentService.GetAgentIdByUserIdAsync(this.User.GetId()!);
+            bool isAgentOwner = await this.houseService
+                .IsAgentWithIdOwnerOfHouseWithIdAsync(id, agentId!);
+
+            if (!isAgentOwner)
+            {
+                this.TempData[ErrorMessage] = "You must be the agent owner of the house you want to edit!";
+                return this.RedirectToAction("Mine", "House");
+            }
+
+           HouseViewModel viewModel = await this.houseService
+                .GetHouseForEditByIdAsync(id);
+
+            viewModel.Categories = await this.categoryService.AllCategoriesAsync();
+
+            return this.View(viewModel); 
         }
 
 
@@ -125,7 +163,7 @@ namespace HouseRentingSystem.Controllers
             bool isUserAgent = await this.agentService
                 .AgentExistsByUserIdAsync(userId);
 
-            if(isUserAgent)
+            if (isUserAgent)
             {
                 string? agentId =
                     await this.agentService.GetAgentIdByUserIdAsync(userId);
@@ -136,7 +174,7 @@ namespace HouseRentingSystem.Controllers
             {
                 myHouses.AddRange(await this.houseService.AllByAgentIdAsync(userId));
             }
-            return this.View(myHouses);  
+            return this.View(myHouses);
         }
 
     }

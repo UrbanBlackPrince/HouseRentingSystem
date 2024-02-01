@@ -210,6 +210,16 @@ namespace HouseRentingSystem.Services.Data.Services
             };
 
         }
+
+        public async Task<bool> IsAgentWithIdOwnerOfHouseWithIdAsync(string houseId, string agentId)
+        {
+            House house = await this.dbContext
+                .Houses
+                .Where(h => h.IsActive)
+               .FirstAsync(h => h.Id == Guid.Parse(houseId));
+
+            return house.AgentId.ToString() == agentId;
+        }
     }
 }
 

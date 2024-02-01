@@ -21,5 +21,7 @@ namespace HouseRentingSystem.Services.Data.Interfaces
         Task<HouseDetailsViewModel> GetDetailsByIdAsync(string houseId);
 
         Task<HouseViewModel> GetHouseForEditByIdAsync(string houseId);
+
+        Task<bool> IsAgentWithIdOwnerOfHouseWithIdAsync(string houseId, string agentId);
     }
 }
