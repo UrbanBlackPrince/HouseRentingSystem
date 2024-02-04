@@ -220,6 +220,23 @@ namespace HouseRentingSystem.Services.Data.Services
 
             return house.AgentId.ToString() == agentId;
         }
+
+        public async Task EditHouseByIdAndFormModel(string houseId, HouseViewModel viewModel)
+        {
+            House house = await this.dbContext
+                .Houses
+                .Where(h => h.IsActive)
+                .FirstAsync(h => h.Id.ToString() == houseId);
+
+            house.Title = viewModel.Title;
+            house.Address = viewModel.Address;
+            house.Description = viewModel.Description;  
+            house.ImageUrl = viewModel.ImageUrl;
+            house.PricePerMounth = viewModel.PricePerMounth;
+            house.CategoryId = viewModel.CategoryId;
+
+            await this.dbContext.SaveChangesAsync();
+        }
     }
 }
 

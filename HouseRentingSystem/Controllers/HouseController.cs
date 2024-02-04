@@ -47,11 +47,18 @@ namespace HouseRentingSystem.Controllers
                 return this.RedirectToAction("Become", "Agent");
             }
 
-            HouseViewModel viewModel = new HouseViewModel()
+            try
             {
-                Categories = await this.categoryService.AllCategoriesAsync()
-            };
-            return View(viewModel);
+                HouseViewModel viewModel = new HouseViewModel()
+                {
+                    Categories = await this.categoryService.AllCategoriesAsync()
+                };
+                return View(viewModel);
+            }
+            catch
+            {
+                return this.GeneralError();
+            }
         }
 
         [HttpPost]
@@ -107,11 +114,17 @@ namespace HouseRentingSystem.Controllers
 
                 return RedirectToAction("All", "House");
             }
+            try
+            {
+                HouseDetailsViewModel viewModel = await this.houseService
+                .GetDetailsByIdAsync(id);
 
-            HouseDetailsViewModel viewModel = await this.houseService
-                 .GetDetailsByIdAsync(id);
-
-            return View(viewModel);
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                return this.GeneralError();
+            }
         }
 
         [HttpGet]
@@ -144,14 +157,72 @@ namespace HouseRentingSystem.Controllers
                 return this.RedirectToAction("Mine", "House");
             }
 
-           HouseViewModel viewModel = await this.houseService
-                .GetHouseForEditByIdAsync(id);
+            try
+            {
+                HouseViewModel viewModel = await this.houseService
+               .GetHouseForEditByIdAsync(id);
 
-            viewModel.Categories = await this.categoryService.AllCategoriesAsync();
+                viewModel.Categories = await this.categoryService.AllCategoriesAsync();
 
-            return this.View(viewModel); 
+                return this.View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                return this.GeneralError();
+            }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Edit(string Id, HouseViewModel viewModel)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                viewModel.Categories = await this.categoryService.AllCategoriesAsync();
+                return this.View(viewModel);
+            }
+
+            bool houseExist = await this.houseService.ExistByIdAsync(Id);
+            if (!houseExist)
+            {
+                this.TempData[ErrorMessage] = "House with the provided id does not exist!";
+
+                return RedirectToAction("All", "House");
+            }
+
+            bool isAgent =
+                 await this.agentService.AgentExistsByUserIdAsync(this.User.GetId()!);
+            if (!isAgent)
+            {
+                this.TempData[ErrorMessage] = "You must become an agent in order to edit house info!";
+
+                return this.RedirectToAction("Become", "Agent");
+            }
+
+            string? agentId = await this.agentService.GetAgentIdByUserIdAsync(this.User.GetId()!);
+            bool isAgentOwner = await this.houseService
+                .IsAgentWithIdOwnerOfHouseWithIdAsync(Id, agentId!);
+
+            if (!isAgentOwner)
+            {
+                this.TempData[ErrorMessage] = "You must be the agent owner of the house you want to edit!";
+                return this.RedirectToAction("Mine", "House");
+            }
+
+            try
+            {
+                await this.houseService.EditHouseByIdAndFormModel(Id, viewModel);
+            }
+            catch (Exception ex)
+            {
+                this.ModelState.AddModelError(string.Empty, ex.Message);
+
+                viewModel.Categories = await this.categoryService.AllCategoriesAsync();
+
+                return this.View(viewModel);
+            }
+
+            return this.RedirectToAction("Details", "House", new { Id });
+        }
 
         [HttpGet]
         public async Task<IActionResult> Mine()
@@ -163,19 +234,32 @@ namespace HouseRentingSystem.Controllers
             bool isUserAgent = await this.agentService
                 .AgentExistsByUserIdAsync(userId);
 
-            if (isUserAgent)
+            try
             {
-                string? agentId =
-                    await this.agentService.GetAgentIdByUserIdAsync(userId);
+                if (isUserAgent)
+                {
+                    string? agentId =
+                        await this.agentService.GetAgentIdByUserIdAsync(userId);
 
-                myHouses.AddRange(await this.houseService.AllByAgentIdAsync(agentId!));
+                    myHouses.AddRange(await this.houseService.AllByAgentIdAsync(agentId!));
+                }
+                else
+                {
+                    myHouses.AddRange(await this.houseService.AllByAgentIdAsync(userId));
+                }
+                return this.View(myHouses);
             }
-            else
+            catch
             {
-                myHouses.AddRange(await this.houseService.AllByAgentIdAsync(userId));
+                return this.GeneralError();
             }
-            return this.View(myHouses);
         }
 
+        private IActionResult GeneralError()
+        {
+            this.TempData[ErrorMessage] = "Unexpected error occured!";
+
+            return this.RedirectToAction("Index", "Home");
+        }
     }
 }
