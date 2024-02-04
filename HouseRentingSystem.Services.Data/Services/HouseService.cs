@@ -37,7 +37,7 @@ namespace HouseRentingSystem.Services.Data.Services
             return lastThreeHouses;
         }
 
-        public async Task CreateAsync(HouseViewModel viewModel, string agentId)
+        public async Task<string> CreateAndReturnIdAsync(HouseViewModel viewModel, string agentId)
         {
             House newHouse = new House()
             {
@@ -53,6 +53,7 @@ namespace HouseRentingSystem.Services.Data.Services
             await this.dbContext.Houses.AddAsync(newHouse);
             await this.dbContext.SaveChangesAsync();
 
+            return newHouse.Id.ToString();
         }
 
         public async Task<AllHousesFilteredAndPagedServiceModel> AllAsync(AllHousesQueryViewModel queryModel)

@@ -90,7 +90,9 @@ namespace HouseRentingSystem.Controllers
             try
             {
                 string? agentId = await this.agentService.GetAgentIdByUserIdAsync(this.User.GetId()!);
-                await this.houseService.CreateAsync(viewModel, agentId!);
+                string houseId = await this.houseService.CreateAndReturnIdAsync(viewModel, agentId!);
+
+                return this.RedirectToAction("Details", "House", new { id = houseId });
             }
             catch (Exception ex)
             {
@@ -99,8 +101,6 @@ namespace HouseRentingSystem.Controllers
 
                 return this.View(viewModel);
             }
-
-            return this.RedirectToAction("All", "House");
         }
 
         [HttpGet]
