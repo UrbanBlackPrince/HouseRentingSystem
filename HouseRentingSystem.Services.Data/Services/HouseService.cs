@@ -37,7 +37,7 @@ namespace HouseRentingSystem.Services.Data.Services
             return lastThreeHouses;
         }
 
-        public async Task CreateAsync(HouseViewModel viewModel, string agentId)
+        public async Task<string> CreateAndReturnIdAsync(HouseViewModel viewModel, string agentId)
         {
             House newHouse = new House()
             {
@@ -53,6 +53,7 @@ namespace HouseRentingSystem.Services.Data.Services
             await this.dbContext.Houses.AddAsync(newHouse);
             await this.dbContext.SaveChangesAsync();
 
+            return newHouse.Id.ToString();
         }
 
         public async Task<AllHousesFilteredAndPagedServiceModel> AllAsync(AllHousesQueryViewModel queryModel)
@@ -221,7 +222,7 @@ namespace HouseRentingSystem.Services.Data.Services
             return house.AgentId.ToString() == agentId;
         }
 
-        public async Task EditHouseByIdAndFormModel(string houseId, HouseViewModel viewModel)
+        public async Task EditHouseByIdAndFormModelAsync(string houseId, HouseViewModel viewModel)
         {
             House house = await this.dbContext
                 .Houses
@@ -235,6 +236,32 @@ namespace HouseRentingSystem.Services.Data.Services
             house.PricePerMounth = viewModel.PricePerMounth;
             house.CategoryId = viewModel.CategoryId;
 
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        public async Task<HousePreDeleteViewModel> GetHouseForDeleteByIdAsync(string houseId)
+        {
+            House house = await this.dbContext
+                .Houses
+                .Where(h => h.IsActive)
+                .FirstAsync(h => h.Id.ToString() == houseId);
+
+            return new HousePreDeleteViewModel()
+            {
+                Title = house.Title,
+                Address = house.Address,
+                ImageUrl = house.ImageUrl,
+            };
+        }
+
+        public async Task DeleteHouseByIdAsync(string houseId)
+        {
+            House houseToDelete = await this.dbContext
+                .Houses
+                .Where(H => H.IsActive)
+                .FirstAsync(h => h.Id.ToString() == houseId);
+
+            houseToDelete.IsActive = false;
             await this.dbContext.SaveChangesAsync();
         }
     }
