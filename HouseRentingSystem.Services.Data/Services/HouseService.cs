@@ -231,7 +231,7 @@ namespace HouseRentingSystem.Services.Data.Services
 
             house.Title = viewModel.Title;
             house.Address = viewModel.Address;
-            house.Description = viewModel.Description;  
+            house.Description = viewModel.Description;
             house.ImageUrl = viewModel.ImageUrl;
             house.PricePerMounth = viewModel.PricePerMounth;
             house.CategoryId = viewModel.CategoryId;
@@ -262,6 +262,47 @@ namespace HouseRentingSystem.Services.Data.Services
                 .FirstAsync(h => h.Id.ToString() == houseId);
 
             houseToDelete.IsActive = false;
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        public async Task<bool> IsRentedByIdAsync(string houseId)
+        {
+            House house = await this.dbContext
+                .Houses
+                .FirstAsync(h => h.Id.ToString() == houseId);
+
+            return house.RenterId.HasValue;
+        }
+
+        public async Task RentHouseAsync(string houseId, string userId)
+        {
+            House house = await this.dbContext
+                 .Houses
+                 .FirstAsync(h => h.Id.ToString() == houseId);
+
+            house.RenterId = Guid.Parse(userId);
+
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        public async Task<bool> IsRentedByUserWithIdAsync(string houseId, string userId)
+        {
+            House house = await this.dbContext
+                .Houses
+                .FirstAsync(h => h.Id.ToString() == houseId);
+
+            return house.RenterId.HasValue &&
+                   house.RenterId.ToString() == userId;
+        }
+
+        public async Task LeaveHouseAsync(string houseId)
+        {
+            House house = await this.dbContext
+                 .Houses
+                 .FirstAsync(h => h.Id.ToString() == houseId);
+
+            house.RenterId = null;
+
             await this.dbContext.SaveChangesAsync();
         }
     }
