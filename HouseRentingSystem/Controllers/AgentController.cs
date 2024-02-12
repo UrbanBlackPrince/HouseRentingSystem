@@ -21,7 +21,7 @@ namespace HouseRentingSystem.Controllers
         public async Task<IActionResult> Become()
         {
             string? userId = this.User.GetId();
-            bool isAgent = await this.agentService.AgentExistsByUserIdAsync(userId);
+            bool isAgent = await this.agentService.AgentExistsByUserIdAsync(userId!);
 
             if (isAgent)
             {
