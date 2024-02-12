@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>cf563612-6c05-4eac-9316-31e8a8c159c0</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HouseRentingSystem.Common\HouseRentingSystem.Common.csproj" />
+    <ProjectReference Include="..\HouseRentingSystem.Infractructure\HouseRentingSystem.Infractructure.csproj" />
+    <ProjectReference Include="..\HouseRentingSystem.Services.Data.Models\HouseRentingSystem.Services.Data.Models.csproj" />
+    <ProjectReference Include="..\HouseRentingSystem.Services.Data\HouseRentingSystem.Services.Data.csproj" />
+  </ItemGroup>
+
+</Project>
