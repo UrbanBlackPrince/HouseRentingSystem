@@ -9,5 +9,6 @@ namespace HouseRentingSystem.Services.Data.Interfaces
         Task<bool> HasRentsByUserIdAsync(string userId);
         Task Create(string userId, BecomeAgentViewModel model);
         Task<string?> GetAgentIdByUserIdAsync(string userId);
+        Task<bool> HasHouseWithIdAsync(string? agentId, string houseId);
     }
 }
