@@ -2,6 +2,7 @@
 using HouseRentingSystem.Data.Models;
 using HouseRentingSystem.Infractructure.Extensions;
 using HouseRentingSystem.Services.Data.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HouseRentingSystem
@@ -30,8 +31,14 @@ namespace HouseRentingSystem
 
 
             builder.Services.AddApplicationServices(typeof(IHouseService));
-            builder.Services.AddControllersWithViews();
+            builder.Services
+                .AddControllersWithViews()
+                .AddMvcOptions(opt =>
+                {
+                    opt.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
+                });
 
+           
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
@@ -56,8 +63,16 @@ namespace HouseRentingSystem
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.MapDefaultControllerRoute();
-            app.MapRazorPages();
+            app.UseEndpoints(config =>
+            {
+                config.MapControllerRoute(
+                    name: "ProtectingUrlPattern",
+                    pattern: "/{controller}/{action}/{id}/{information}",
+                    defaults: new { Controller = "Category", Action = "Details" });
+                config.MapDefaultControllerRoute();
+                config.MapRazorPages();
+
+            });
 
             app.Run();
         }
