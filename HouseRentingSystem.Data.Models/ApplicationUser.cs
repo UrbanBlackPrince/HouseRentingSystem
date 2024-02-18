@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
+using static HouseRentingSystem.Common.EntityValidationConstants.User;
 
 namespace HouseRentingSystem.Data.Models
 {
