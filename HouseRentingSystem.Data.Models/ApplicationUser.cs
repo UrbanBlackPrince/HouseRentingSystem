@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
-using static HouseRentingSystem.Common.EntityValidationConstants.User
+using static HouseRentingSystem.Common.EntityValidationConstants.User;
 
 namespace HouseRentingSystem.Data.Models
 {
@@ -11,14 +11,6 @@ namespace HouseRentingSystem.Data.Models
             this.Id = Guid.NewGuid();
             this.RentedHouses = new HashSet<House>();  
         }
-
-        [Required]
-        [MaxLength(FirstNameMaxLength)]
-        public string FirstName { get; set; } = null!;
-
-        [Required]
-        [MaxLength(LastNameMaxLength)]
-        public string LastName { get; set; } = null!;
 
         public virtual ICollection<House> RentedHouses { get; set; }
     }
